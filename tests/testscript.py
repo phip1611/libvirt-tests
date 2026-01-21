@@ -114,18 +114,23 @@ class LibvirtTests(SaveLogsOnErrorTestCase):
         controllerVM.succeed("ssh -o StrictHostKeyChecking=no computeVM echo")
         computeVM.succeed("ssh -o StrictHostKeyChecking=no controllerVM echo")
 
-        controllerVM.succeed(
-            'virsh pool-define-as --name "nfs-share" --type netfs --source-host "localhost" --source-path "nfs-root" --source-format "nfs" --target "/var/lib/libvirt/storage-pools/nfs-share"'
-        )
-        controllerVM.succeed("virsh pool-start nfs-share")
+        out = controllerVM.succeed("virsh pool-list")
+        if "nfs-share" not in out:
+            controllerVM.succeed(
+                'virsh pool-define-as --name "nfs-share" --type netfs --source-host "localhost" --source-path "nfs-root" --source-format "nfs" --target "/var/lib/libvirt/storage-pools/nfs-share"'
+            )
+            controllerVM.succeed("virsh pool-start nfs-share")
+        out = computeVM.succeed("virsh pool-list")
+        if "nfs-share" not in out:
+            computeVM.succeed(
+                'virsh pool-define-as --name "nfs-share" --type netfs --source-host "controllerVM" --source-path "nfs-root" --source-format "nfs" --target "/var/lib/libvirt/storage-pools/nfs-share"'
+            )
+            computeVM.succeed("virsh pool-start nfs-share")
 
-        computeVM.succeed(
-            'virsh pool-define-as --name "nfs-share" --type netfs --source-host "controllerVM" --source-path "nfs-root" --source-format "nfs" --target "/var/lib/libvirt/storage-pools/nfs-share"'
-        )
-        computeVM.succeed("virsh pool-start nfs-share")
-
-        # Define a libvirt network and automatically starts it
-        controllerVM.succeed("virsh net-create /etc/libvirt_test_network.xml")
+        out = controllerVM.succeed("virsh net-list")
+        if "libvirt-testnetwork" not in out:
+            # Define a libvirt network and automatically starts it
+            controllerVM.succeed("virsh net-create /etc/libvirt_test_network.xml")
 
     def setUp(self):
         # A restart of the libvirt daemon resets the logging configuration, so
