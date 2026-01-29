@@ -1,6 +1,6 @@
 {
   pkgs,
-  libvirt-src,
+  libvirt,
   nixos-image,
   chv-ovmf,
 }:
@@ -8,7 +8,7 @@
 rec {
   default = pkgs.callPackage ./libvirt-test.nix {
     inherit
-      libvirt-src
+      libvirt
       nixos-image
       chv-ovmf
       ;
@@ -17,7 +17,7 @@ rec {
 
   live_migration = pkgs.callPackage ./libvirt-test.nix {
     inherit
-      libvirt-src
+      libvirt
       nixos-image
       chv-ovmf
       ;
@@ -26,7 +26,7 @@ rec {
 
   hugepage = pkgs.callPackage ./libvirt-test.nix {
     inherit
-      libvirt-src
+      libvirt
       nixos-image
       chv-ovmf
       ;
@@ -35,7 +35,7 @@ rec {
 
   long_migration_with_load = pkgs.callPackage ./libvirt-test.nix {
     inherit
-      libvirt-src
+      libvirt
       nixos-image
       chv-ovmf
       ;

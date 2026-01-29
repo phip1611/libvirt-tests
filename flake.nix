@@ -7,11 +7,10 @@
 
     # A local path can be used for developing or testing local changes. Make
     # sure the submodules in a local libvirt checkout are populated.
-    libvirt-src = {
+    libvirt = {
       # url = "git+file:<path/to/libvirt>?submodules=1";
       url = "git+https://github.com/cyberus-technology/libvirt?ref=gardenlinux&submodules=1";
       # url = "git+ssh://git@gitlab.cyberus-technology.de/cyberus/cloud/libvirt?ref=managedsave-fix&submodules=1";
-      flake = false;
     };
     cloud-hypervisor = {
       # url = "git+file:<path/to/cloud-hypervisor>";
@@ -56,7 +55,6 @@
         cloud-hypervisor,
         edk2-src,
         fcntl-tool,
-        libvirt-src,
         nixpkgs,
         ...
       }:
@@ -235,10 +233,12 @@
         tests = import ./tests/default.nix {
           inherit
             pkgs
-            libvirt-src
             nixos-image
             chv-ovmf
             ;
+          # We explicitly use the raw flake input and not the modified version
+          # from dried-nix-flakes here for better cross-repository usability.
+          libvirt = inputs.libvirt;
         };
       }
     );
